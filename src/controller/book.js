@@ -17,6 +17,10 @@ const   getAllBook = async (req, res) => {
 
 const getDetail = async (req, res) => {
     try {
+        /**
+         * lấy và chèn thông tin chi tiết của thể loại (category) tương ứng với categoryId từ cuốn sách. 
+         * Điều này giúp thay vì chỉ nhận được ID của thể loại, bạn sẽ nhận được cả thông tin đầy đủ về thể loại đó.
+         */
         const bookId = await Book.findById(req.params.id).populate("categoryId");;
         if(!bookId) return res.status(404).json({
             message: "không tìm thấy sách !"
@@ -56,8 +60,9 @@ const addNewBook = async (req, res) => {
             message: "thêm thất bại !"
         })
 
-        //add book to category
+        // tìm và cập nhật thể loại sách (dựa trên categoryId của sách vừa được tạo).
         const updateCategory = await Category.findByIdAndUpdate(newBook.categoryId, {
+            //  thêm _id của cuốn sách mới vào danh sách books của thể loại đó (tránh trùng lặp).
             $addToSet: {
                 books: newBook._id
             }
